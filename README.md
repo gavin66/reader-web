@@ -35,7 +35,7 @@ Web 版网络小说与漫画阅读器
 
 1. 下载项目
 ```sh
-$ git https://github.com/gavin66/reader-web.git
+$ git clone https://github.com/gavin66/reader-web.git
 ```
 
 2. 安装
