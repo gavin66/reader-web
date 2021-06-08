@@ -8,7 +8,7 @@
         <swiper-item :style='index==0?{position: "static"}:""'>
           <card v-for="(follow,index) in novels" v-bind:key="index" class="n-card">
             <div slot="header" class="header" @click="toNovelCatalog(follow)">{{ follow.novel }}</div>
-            <div slot="content" class="content" @click="toNovelChapter(follow.novel, follow.catalog_url, follow.chapter_url)">{{ follow.chapter }}</div>
+            <div slot="content" class="content" @click="toNovelChapter(follow)">{{ follow.chapter }}</div>
           </card>
         </swiper-item>
         <swiper-item :style='index==1?{position: "static"}:""'>
@@ -32,13 +32,12 @@ export default {
     return {
       index: 0, // tab index
       indexName: 'novel',
-      reading: {}, // 当前阅读元数据
+      // reading: {}, // 当前阅读元数据
       novels: [], // 收藏列表
       comics: [] // 收藏列表
     }
   },
   created() {
-    this.reading = this.$store.getters.novel
     novels({}).then(res => {
       this.novels = res.data
     })
@@ -47,34 +46,27 @@ export default {
     })
   },
   methods: {
-    toNovelChapter(name, nUrl, cUrl) {
+    toNovelChapter(novel) {
       // 设置当前阅读的小说
-      this.reading.novel_url = nUrl
-      this.reading.chapter_name = name
-      this.reading.chapter_url = cUrl
-      this.reading.is_follow = true
-      this.$store.commit('common/SET_NOVEL', this.reading)
+      this.$store.commit('common/SET_NOVEL', Object.assign(novel, { is_follow: true }))
       // 跳到小说章节
       this.$router.push({ name: 'NovelChapter' })
     },
-    toNovelCatalog(follow) {
+    toNovelCatalog(novel) {
       // 设置为当前阅读小说
-      this.$store.commit('common/SET_NOVEL', {
-        novel: follow.novel,
-        novel_url: follow.catalog_url
-      })
+      this.$store.commit('common/SET_NOVEL', Object.assign(novel, { is_follow: true }))
       // 跳到小说目录
       this.$router.push({ name: 'NovelCatalog' })
     },
     toComicChapter(comic) {
       // 设置当前阅读的漫画
-      this.$store.commit('common/SET_COMIC', comic)
+      this.$store.commit('common/SET_COMIC', Object.assign(comic, { is_follow: true }))
       // 跳到漫画章节
       this.$router.push({ name: 'ComicChapter' })
     },
     toComicCatalog(comic) {
       // 设置当前阅读的漫画
-      this.$store.commit('common/SET_COMIC', comic)
+      this.$store.commit('common/SET_COMIC', Object.assign(comic, { is_follow: true }))
       // 跳到漫画目录
       this.$router.push({ name: 'ComicCatalog' })
     }

@@ -38,7 +38,7 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    if (res.code !== 200) {
       Vue.$vux.toast.show({
         type: 'warn',
         text: res.message || 'Error'

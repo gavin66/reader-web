@@ -31,12 +31,13 @@ export default {
   watch: {
     reading(reading, old) {
       if (
-        !reading.hasOwnProperty('novel_url') ||
-        reading.novel_url.length === 0
+        !reading.hasOwnProperty('catalog_url') ||
+        !reading.hasOwnProperty('platform') ||
+        reading.catalog_url.length === 0
       ) {
         this.$router.replace({ name: 'NovelSearch' })
-      } else if (reading.novel_url !== old.novel_url) {
-        catalog({ url: reading.novel_url }).then(res => {
+      } else if (reading.catalog_url !== old.catalog_url) {
+        catalog({ platform: reading.platform, url: reading.catalog_url }).then(res => {
           this.items = res.data.catalog
           reading.is_follow = res.data.is_follow
           if (res.data.is_follow) {
@@ -58,15 +59,17 @@ export default {
     follow() {
       if (this.follow_status === 'unfollowed') {
         follow({
+          platform: this.reading.platform,
           novel: this.reading.novel,
-          catalog_url: this.reading.novel_url
+          catalog_url: this.reading.catalog_url
         }).then(res => {
           // 收藏成功
           this.follow_status = 'followed'
         })
       } else if (this.follow_status === 'followed') {
         unfollow({
-          catalog_url: this.reading.novel_url
+          platform: this.reading.platform,
+          catalog_url: this.reading.catalog_url
         }).then(res => {
           // 取消成功
           this.follow_status = 'unfollowed'
@@ -75,9 +78,7 @@ export default {
     },
     toChapter(item) {
       // 设置当前阅读的小说
-      this.reading.chapter_name = item.chapter
-      this.reading.chapter_url = item.chapter_url
-      this.$store.commit('common/SET_NOVEL', this.reading)
+      this.$store.commit('common/SET_NOVEL', Object.assign(this.reading, item))
       // 跳到小说章节
       this.$router.push({ name: 'NovelChapter' })
     }

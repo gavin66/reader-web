@@ -5,10 +5,10 @@
       </div>
       <header>{{ title }}</header>
       <article @click="setShow(!isShow)">
-        <p v-for="(row, index) in content" v-bind:key="index">{{ row }}</p>
+        <p v-for="(row, index) in content" v-bind:key="index" style="text-indent: 2em">{{ row }}</p>
       </article>
       <div class="next" v-if="nextUrl">
-        <span @click="getChapter(nextUrl)">下一章</span>
+        <span @click="getChapter(platform,nextUrl)">下一章</span>
       </div>
     </div>
 </template>
@@ -27,6 +27,7 @@ export default {
       title: '', // 章节名
       content: [], // 正文
       nextUrl: '', // 下一章
+      platform: '', // 平台
       currentScrollTop: 0, // 当前垂直滚动像素数
       isShow: true // 显示 nav, bar
     }
@@ -65,15 +66,16 @@ export default {
         this.$router.replace({ name: 'NovelSearch' })
       }
       if (reading.chapter_url !== old.chapter_url) {
+        this.platform = reading.platform
         this.$store.commit('common/SET_TITLE', reading.novel)
-        this.getChapter(reading.chapter_url)
+        this.getChapter(this.platform, reading.chapter_url)
       }
     }
   },
   methods: {
-    getChapter: function(url) {
+    getChapter: function(platform, url) {
       this.isLoading = true
-      chapter({ url: url })
+      chapter({ url: url, platform: platform })
         .then(res => {
           this.isLoading = false
           this.title = res.data.title
@@ -88,9 +90,10 @@ export default {
           document.body.scrollTop = 0
           this.reading.is_follow &&
             progress({
-              catalog_url: this.reading.novel_url,
+              catalog_url: this.reading.catalog_url,
               chapter: res.data.title,
-              chapter_url: url
+              chapter_url: url,
+              platform: this.reading.platform
             })
         })
         .catch(() => {
